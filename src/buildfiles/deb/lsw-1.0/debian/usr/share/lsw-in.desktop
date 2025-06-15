@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=LSW Install
+Type=Application
+Exec=/usr/bin/lsw-in.sh
+Terminal=true
+Icon=/usr/bin/lsw-in.png
+Comment=Install Linux Subsystem for Windows
+NoDisplay=false
+Categories=Development

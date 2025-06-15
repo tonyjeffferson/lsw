@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=LSW Refresh
+Type=Application
+Exec=/usr/bin/lsw-refresh.sh
+Terminal=true
+Icon=/usr/bin/lsw-refresh.png
+Comment=Refresh Linux Subsystem for Windows' app list
+NoDisplay=false
+Categories=Development
