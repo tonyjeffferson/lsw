@@ -57,7 +57,7 @@ windocker () {
     fi
     _cdir=""
     _cdir=$(whiptail --inputbox "Enter location for Windows installation." 10 30 3>&1 1>&2 2>&3)
-    if [ -z "$_cdir" ] || [ ! -f "$_cdir" ]; then
+    if [ -z "$_cdir" ] || [ ! -d "$_cdir" ]; then
         local title="Error"
         local msg="Invalid path for installation, try again."
         _msgbox_
