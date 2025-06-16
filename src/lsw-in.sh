@@ -123,8 +123,12 @@ lsw_menu () {
     wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-off.sh
     wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-on.sh
     wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-refresh.sh
+    wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-off.png
+    wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-on.png
+    wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-refresh.png
     sudo mv *.desktop /usr/share/applications/
     sudo mv *.sh /usr/bin/
+    sudo mv *.png /usr/bin/
     cd ..
     sleep 1
     rm -rf lsw
