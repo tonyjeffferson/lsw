@@ -17,6 +17,7 @@ depcheck () {
 }
 
 # install windows on docker
+## TODO ADD ADDITIONAL DISKS OPTION
 windocker () {
 
     # get compose file
