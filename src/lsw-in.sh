@@ -25,7 +25,7 @@ windocker () {
     wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/compose.yaml
     # make necessary adjustments to compose file
     _cram=""
-    _cram=$(whiptail --inputbox "Enter RAM allocation for Windows container, in GB. Leave empty to use 12GB." 10 30 3>&1 1>&2 2>&3)
+    _cram=$(whiptail --inputbox "Enter RAM allocation for Windows container, in GB. Leave empty to use 8GB." 10 30 3>&1 1>&2 2>&3)
     local available_kb=$(grep MemAvailable /proc/meminfo | awk '{ print $2 }')
     local available_gb=$(echo "$available_kb / 1048576" | bc)
     if (( _cram > available_gb )); then
@@ -35,7 +35,7 @@ windocker () {
         return
     else
         if [ -z "$_cram" ]; then
-            _winram="12"
+            _winram="8"
         else
             _winram="$_cram"
         fi
@@ -108,7 +108,11 @@ winapp_config () {
     docker compose --file ~/.config/winapps/compose.yaml start
     git clone https://github.com/winapps-org/winapps.git
     cd winapps
-    bash <(curl https://raw.githubusercontent.com/winapps-org/winapps/main/setup.sh)
+    local title="LSW"
+    local msg="Now a test for RDP will be performed. It should show you the Windows 10 subsystem in a window, and it is safe to close once it logs in."
+    _msgbox_
+    xfreerdp3 /u:"lsw" /p:"lsw" /v:127.0.0.1 /cert:tofu
+    ./setup.sh
 
 }
 
@@ -130,7 +134,12 @@ lsw_menu () {
     sudo mv *.desktop /usr/share/applications/
     sudo mv *.sh /usr/bin/
     sudo mv *.png /usr/bin/
-    cd ..
+    cd /usr/bin
+    sleep 1
+    chmod +x lsw-refresh.sh
+    chmod +x lsw-on.sh
+    chmod +x lsw-off.sh
+    cd $HOME
     sleep 1
     rm -rf lsw
     local title="LSW"
