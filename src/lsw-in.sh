@@ -113,6 +113,8 @@ winapp_config () {
     _msgbox_
     xfreerdp3 /u:"lsw" /p:"lsw" /v:127.0.0.1 /cert:tofu
     ./setup.sh
+    cd ..
+    rm winapps
 
 }
 
