@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=LSW Uninstall
+Type=Application
+Exec=/usr/bin/lsw-rm.sh
+Terminal=true
+Icon=/usr/bin/lsw-rm.png
+Comment=Clean up Linux Subsystem for Windows
+NoDisplay=false
+Categories=Development

@@ -64,10 +64,34 @@ windocker () {
     else
         _windir="$_cdir"
     fi
+    _csize=$(whiptail --inputbox "Enter Windows disk (C:) size in GB. Leave empty to use 120GB." 10 30 3>&1 1>&2 2>&3)
+    local available_gb=$(df -BG "$_cdir" | awk 'NR==2 { gsub("G","",$4); print $4 }')
+    if [ -z "$_csize" ]; then
+        _winsize="120"
+    else
+        _winsize="$_csize"
+    fi
+    if (( _winsize < "50" )); then
+        local title="Error"
+        local msg="Not enough space to install Windows, minimum 50GB."
+        _msgbox_
+        return
+    fi
+    if (( available_gb < _winsize )); then
+        local title="Error"
+        local msg="Not enough disk space in $_cdir: ${_winsize} GB required, ${available_gb} GB available."
+        _msgbox_
+        return
+    fi
     sed -i "s|^\(\s*RAM_SIZE:\s*\).*|\1\"${_winram}G\"|" compose.yaml
     sed -i "s|^\(\s*CPU_CORES:\s*\).*|\1\"${_wincpu}\"|" compose.yaml
     sed -i "s|^\(\s*device:\s*\).*|\1\"${_windir}\"|" compose.yaml
-    sudo docker compose --file ./compose.yaml up
+    sed -i "s|^\(\s*DISK_SIZE:\s*\).*|\1\"${_winsize}\"|" compose.yaml
+    if command -v konsole &> /dev/null; then
+        setsid konsole --noclose -e sudo docker compose --file ./compose.yaml up >/dev/null 2>&1 < /dev/null &
+    elif command -v gnome-terminal &> /dev/null; then
+        setsid gnome-terminal -- bash -c "sudo docker compose --file ./compose.yaml up; exec bash" >/dev/null 2>&1 < /dev/null &
+    fi
 
 }
 
@@ -79,9 +103,48 @@ winapp_config () {
     mkdir -p .config/winapps
     mv winapps.conf .config/winapps/
     mv compose.yaml .config/winapps/
+    docker compose --file ~/.config/winapps/compose.yaml stop
+    docker compose --file ~/.config/winapps/compose.yaml start
     git clone https://github.com/winapps-org/winapps.git
     cd winapps
     bash <(curl https://raw.githubusercontent.com/winapps-org/winapps/main/setup.sh)
 
 }
 
+# configure LSW menu entries
+lsw_menu () {
+
+    cd $HOME
+    mkdir -p lsw
+    cd lsw
+    wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-off.desktop
+    wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-on.desktop
+    wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-refresh.desktop
+    sudo mv *.desktop /usr/share/applications/
+    cd ..
+    sleep 1
+    rm -rf lsw
+    local title="LSW"
+    local msg="All done. Enjoy your Windows apps."
+    _msgbox_
+
+}
+
+# runtime
+. /etc/os-release
+source <(curl -s https://raw.githubusercontent.com/psygreg/linuxtoys/refs/heads/main/src/linuxtoys.lib)
+# step 1 - docker setup
+depcheck
+windocker
+# step 2 - winapps config
+if whiptail --title "Setup" --yesno "Is the Windows installation finished?" 8 78; then
+    winapp_config
+    lsw_menu
+    exit 0
+else
+    if whiptail --title "Setup" --yesno "Do you want to revert all changes? WARNING: This will ERASE all Docker Compose data!" 8 78; then
+        docker compose down --rmi=all --volumes
+        rm compose.yaml
+        exit 1
+    fi
+fi
