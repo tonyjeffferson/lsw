@@ -55,7 +55,7 @@ windocker () {
     _cdir=$(whiptail --inputbox "Enter location for Windows installation. Leave empty for ${HOME}/Windows." 10 30 3>&1 1>&2 2>&3)
     if [ -z "$_cdir" ]; then
         mkdir -p Windows
-        _windir="$HOME/Windows"
+        _windir="${HOME}/Windows"
     elif [ ! -d "$_cdir" ]; then
         local title="Error"
         local msg="Invalid path for installation, try again."
@@ -65,7 +65,7 @@ windocker () {
         _windir="$_cdir"
     fi
     _csize=$(whiptail --inputbox "Enter Windows disk (C:) size in GB. Leave empty to use 100GB." 10 30 3>&1 1>&2 2>&3)
-    local available_gb=$(df -BG "$_cdir" | awk 'NR==2 { gsub("G","",$4); print $4 }')
+    local available_gb=$(df -BG "$_windir" | awk 'NR==2 { gsub("G","",$4); print $4 }')
     if [ -z "$_csize" ]; then
         _winsize="100"
     else
