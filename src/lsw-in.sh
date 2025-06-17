@@ -24,21 +24,29 @@ windocker () {
     wget -nc https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/compose.yaml
     # make necessary adjustments to compose file
     local total_kb=$(grep MemTotal /proc/meminfo | awk '{ print $2 }')
-    local total_gb=$(echo "$total_kb / 1048576" | bc)
     local available_kb=$(grep MemAvailable /proc/meminfo | awk '{ print $2 }')
-    local available_gb=$(echo "$available_kb / 1048576" | bc)
+    local total_gb=$(( total_kb / 1024 / 1024 ))
+    local available_gb=$(( available_kb / 1024 / 1024 ))
     _cram=$(( total_gb / 3 ))
-    if (( _cram > available_gb )) || (( _cram < 4 )); then
+    # Enforce minimum
+    if (( _cram < 4 )); then
         local title="Error"
-        local msg="Not enough RAM available. Try closing some applications before proceeding if you have over 16GB of RAM."
+        local msg="System RAM too low. At least 12GB total is required to continue."
         _msgbox_
         exit 1
+    fi
+    # Enforce availability with 1GB buffer (to avoid rounding issues)
+    if (( available_gb < (_cram + 1) )); then
+        local title="Error"
+        local msg="Not enough free RAM. Close some applications and try again."
+        _msgbox_
+        exit 1
+    fi
+    # Cap at 16GB
+    if (( _cram > 16 )); then
+        _winram=16
     else
-        if (( _cram > 16 )); then
-            _winram="16"
-        else
-            _winram="$_cram"
-        fi
+        _winram=$_cram
     fi
     local _total_threads=$(nproc)
     _ccpu=$(( _total_threads / 2 ))
