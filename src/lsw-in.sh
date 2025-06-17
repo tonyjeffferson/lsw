@@ -54,6 +54,12 @@ windocker () {
     fi
     local _total_threads=$(nproc)
     _ccpu=$(( _total_threads / 2 ))
+    if (( _ccpu > 2 )); then
+        local title="Error"
+        local msg="Not enough space to install Windows, minimum 40GB."
+        _msgbox_
+        exit 6
+    fi
     _wincpu="$_ccpu"
     _cdir=""
     _cdir=$(whiptail --inputbox "Enter location for Windows installation. Leave empty for ${HOME}/Windows." 10 30 3>&1 1>&2 2>&3)
