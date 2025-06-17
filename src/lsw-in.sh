@@ -54,7 +54,7 @@ windocker () {
     fi
     local _total_threads=$(nproc)
     _ccpu=$(( _total_threads / 2 ))
-    if (( _ccpu > 2 )); then
+    if (( _ccpu < 2 )); then
         local title="Error"
         local msg="Not enough space to install Windows, minimum 40GB."
         _msgbox_
