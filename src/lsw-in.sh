@@ -157,17 +157,24 @@ lsw_menu () {
 . /etc/os-release
 source <(curl -s https://raw.githubusercontent.com/psygreg/linuxtoys/refs/heads/main/src/linuxtoys.lib)
 # step 1 - docker setup
-depcheck
-windocker
-# step 2 - winapps config
-if whiptail --title "Setup" --yesno "Is the Windows installation finished?" 8 78; then
-    winapp_config
-    lsw_menu
-    exit 0
-else
-    if whiptail --title "Setup" --yesno "Do you want to revert all changes? WARNING: This will ERASE all Docker Compose data!" 8 78; then
-        docker compose down --rmi=all --volumes
-        docker
-        exit 1
+if [ -e /dev/kvm ]; then
+    depcheck
+    windocker
+    # step 2 - winapps config
+    if whiptail --title "Setup" --yesno "Is the Windows installation finished?" 8 78; then
+        winapp_config
+        lsw_menu
+        exit 0
+    else
+        if whiptail --title "Setup" --yesno "Do you want to revert all changes? WARNING: This will ERASE all Docker Compose data!" 8 78; then
+            docker compose down --rmi=all --volumes
+            docker
+            exit 1
+        fi
     fi
+else
+    title="LSW"
+    msg="KVM unavailable. Enable Intel VT-x or AMD SVM on BIOS and try again."
+    _msgbox_
+    exit 5
 fi
