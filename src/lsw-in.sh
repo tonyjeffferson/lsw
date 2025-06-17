@@ -21,7 +21,7 @@ windocker () {
 
     # get compose file
     cd $HOME
-    wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/compose.yaml
+    wget -nc https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/compose.yaml
     # make necessary adjustments to compose file
     local total_kb=$(grep MemTotal /proc/meminfo | awk '{ print $2 }')
     local total_gb=$(echo "$total_kb / 1048576" | bc)
