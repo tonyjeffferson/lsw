@@ -17,25 +17,25 @@ depcheck () {
 }
 
 # install windows on docker
-## TODO ADD ADDITIONAL DISKS OPTION
 windocker () {
 
     # get compose file
     cd $HOME
     wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/compose.yaml
     # make necessary adjustments to compose file
-    _cram=""
-    _cram=$(whiptail --inputbox "Enter RAM allocation for Windows container, in GB. Leave empty to use 10GB." 10 30 3>&1 1>&2 2>&3)
+    local total_kb=$(grep MemTotal /proc/meminfo | awk '{ print $2 }')
+    local total_gb=$(echo "$total_kb / 1048576" | bc)
     local available_kb=$(grep MemAvailable /proc/meminfo | awk '{ print $2 }')
     local available_gb=$(echo "$available_kb / 1048576" | bc)
-    if (( _cram > available_gb )); then
+    _cram=$(( total_gb / 3 ))
+    if (( _cram > available_gb )) || (( _cram < 4 )); then
         local title="Error"
-        local msg="Not enough RAM: ${_cram} GB, available: ${available_gb} GB."
+        local msg="Not enough RAM available. Try closing some applications before proceeding if you have over 16GB of RAM."
         _msgbox_
-        return
+        exit 1
     else
-        if [ -z "$_cram" ]; then
-            _winram="10"
+        if (( _cram > 16 )); then
+            _winram="16"
         else
             _winram="$_cram"
         fi
@@ -44,33 +44,36 @@ windocker () {
     _ccpu=$(( _total_threads / 2 ))
     _wincpu="$_ccpu"
     _cdir=""
-    _cdir=$(whiptail --inputbox "Enter location for Windows installation." 10 30 3>&1 1>&2 2>&3)
-    if [ -z "$_cdir" ] || [ ! -d "$_cdir" ]; then
+    _cdir=$(whiptail --inputbox "Enter location for Windows installation. Leave empty for ${HOME}/Windows." 10 30 3>&1 1>&2 2>&3)
+    if [ -z "$_cdir" ]; then
+        mkdir -p Windows
+        _windir="$HOME/Windows"
+    elif [ ! -d "$_cdir" ]; then
         local title="Error"
         local msg="Invalid path for installation, try again."
         _msgbox_
-        return
+        exit 2
     else
         _windir="$_cdir"
     fi
-    _csize=$(whiptail --inputbox "Enter Windows disk (C:) size in GB. Leave empty to use 120GB." 10 30 3>&1 1>&2 2>&3)
+    _csize=$(whiptail --inputbox "Enter Windows disk (C:) size in GB. Leave empty to use 100GB." 10 30 3>&1 1>&2 2>&3)
     local available_gb=$(df -BG "$_cdir" | awk 'NR==2 { gsub("G","",$4); print $4 }')
     if [ -z "$_csize" ]; then
-        _winsize="120"
+        _winsize="100"
     else
         _winsize="$_csize"
     fi
-    if (( _winsize < "50" )); then
+    if (( _winsize < "40" )); then
         local title="Error"
-        local msg="Not enough space to install Windows, minimum 50GB."
+        local msg="Not enough space to install Windows, minimum 40GB."
         _msgbox_
-        return
+        exit 4
     fi
     if (( available_gb < _winsize )); then
         local title="Error"
         local msg="Not enough disk space in $_cdir: ${_winsize} GB required, ${available_gb} GB available."
         _msgbox_
-        return
+        exit 3
     fi
     sed -i "s|^\(\s*RAM_SIZE:\s*\).*|\1\"${_winram}G\"|" compose.yaml
     sed -i "s|^\(\s*CPU_CORES:\s*\).*|\1\"${_wincpu}\"|" compose.yaml
