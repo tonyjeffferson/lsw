@@ -89,7 +89,7 @@ windocker () {
     sed -i "s|^\(\s*device:\s*\).*|\1\"${_windir}\"|" compose.yaml
     sed -i "s|^\(\s*DISK_SIZE:\s*\).*|\1\"${_winsize}\"|" compose.yaml
     if command -v konsole &> /dev/null; then
-        setsid konsole --noclose -e sudo docker compose --file ./compose.yaml up >/dev/null 2>&1 < /dev/null &
+        setsid konsole --noclose -e  "sudo docker compose --file ./compose.yaml up" >/dev/null 2>&1 < /dev/null &
     elif command -v gnome-terminal &> /dev/null; then
         setsid gnome-terminal -- bash -c "sudo docker compose --file ./compose.yaml up; exec bash" >/dev/null 2>&1 < /dev/null &
     fi
