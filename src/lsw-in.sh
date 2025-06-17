@@ -25,7 +25,7 @@ windocker () {
     wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/compose.yaml
     # make necessary adjustments to compose file
     _cram=""
-    _cram=$(whiptail --inputbox "Enter RAM allocation for Windows container, in GB. Leave empty to use 8GB." 10 30 3>&1 1>&2 2>&3)
+    _cram=$(whiptail --inputbox "Enter RAM allocation for Windows container, in GB. Leave empty to use 10GB." 10 30 3>&1 1>&2 2>&3)
     local available_kb=$(grep MemAvailable /proc/meminfo | awk '{ print $2 }')
     local available_gb=$(echo "$available_kb / 1048576" | bc)
     if (( _cram > available_gb )); then
