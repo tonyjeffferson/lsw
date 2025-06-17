@@ -13,6 +13,7 @@ depcheck () {
         local _packages=(docker docker-compose curl dialog freerdp git iproute2 libnotify-tools netcat-openbsd)
     fi
     _install_
+    sudo usermod -aG docker $USER
     sudo systemctl enable docker
     sudo systemctl start docker
 
