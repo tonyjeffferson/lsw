@@ -35,7 +35,7 @@ windocker () {
         return
     else
         if [ -z "$_cram" ]; then
-            _winram="8"
+            _winram="10"
         else
             _winram="$_cram"
         fi
