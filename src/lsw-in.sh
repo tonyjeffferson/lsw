@@ -40,21 +40,9 @@ windocker () {
             _winram="$_cram"
         fi
     fi
-    _ccpu=""
-    _ccpu=$(whiptail --inputbox "Enter number of CPU cores for Windows container. Leave empty to use 4." 10 30 3>&1 1>&2 2>&3)
-    local available_cpu=$(nproc)
-    if (( _ccpu > available_cpu )); then
-        local title="Error"
-        local msg="Not enough CPU cores: ${_cram}, available: ${available_gb}."
-        _msgbox_
-        return
-    else
-        if [ -z "$_ccpu" ]; then
-            _wincpu="4"
-        else
-            _wincpu="$_ccpu"
-        fi
-    fi
+    local _total_threads=$(nproc)
+    _ccpu=$(( _total_threads / 2 ))
+    _wincpu="$_ccpu"
     _cdir=""
     _cdir=$(whiptail --inputbox "Enter location for Windows installation." 10 30 3>&1 1>&2 2>&3)
     if [ -z "$_cdir" ] || [ ! -d "$_cdir" ]; then
