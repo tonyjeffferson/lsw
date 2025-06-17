@@ -13,6 +13,8 @@ depcheck () {
         local _packages=(docker docker-compose curl dialog freerdp git iproute2 libnotify-tools netcat-openbsd)
     fi
     _install_
+    sudo systemctl enable docker
+    sudo systemctl start docker
 
 }
 
@@ -163,7 +165,7 @@ if whiptail --title "Setup" --yesno "Is the Windows installation finished?" 8 78
 else
     if whiptail --title "Setup" --yesno "Do you want to revert all changes? WARNING: This will ERASE all Docker Compose data!" 8 78; then
         docker compose down --rmi=all --volumes
-        rm compose.yaml
+        docker
         exit 1
     fi
 fi
