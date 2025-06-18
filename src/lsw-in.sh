@@ -115,15 +115,12 @@ winapp_config () {
     mv compose.yaml .config/winapps/
     docker compose --file ~/.config/winapps/compose.yaml stop
     docker compose --file ~/.config/winapps/compose.yaml start
-    git clone https://github.com/winapps-org/winapps.git
-    cd winapps
     local title="LSW"
     local msg="Now a test for RDP will be performed. It should show you the Windows 10 subsystem in a window, and it is safe to close once it logs in."
     _msgbox_
     xfreerdp3 /u:"lsw" /p:"lsw" /v:127.0.0.1 /cert:tofu
-    ./setup.sh
-    cd ..
-    rm winapps
+    sleep 2
+    bash <(curl https://raw.githubusercontent.com/winapps-org/winapps/main/setup.sh)
 
 }
 
