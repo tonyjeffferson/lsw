@@ -174,7 +174,6 @@ if [ -e /dev/kvm ]; then
     else
         if whiptail --title "Setup" --yesno "Do you want to revert all changes? WARNING: This will ERASE all Docker Compose data!" 8 78; then
             docker compose down --rmi=all --volumes
-            docker
             exit 1
         fi
     fi
