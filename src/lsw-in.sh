@@ -3,8 +3,10 @@
 # check dependencies
 depcheck () {
 
-    if [[ "$ID_LIKE" == *debian* ]] || [[ "$ID_LIKE" == *ubuntu* ]] || [ "$ID" == "debian" ] || [ "$ID" == "ubuntu" ]; then
+    if [[ "$ID_LIKE" == *debian* ]] || [[ "$ID_LIKE" == *ubuntu* ]] || [ "$ID" == "ubuntu" ]; then
         local _packages=(docker.io docker-compose docker-compose-plugin curl dialog freerdp3-x11 git iproute2 libnotify-bin netcat-openbsd)
+    elif [ "$ID" == "debian" ]; then
+        local _packages=(docker.io docker-compose curl dialog freerdp3-x11 git iproute2 libnotify-bin netcat-openbsd)
     elif [[ "$ID_LIKE" =~ (rhel|fedora) ]] || [[ "$ID" =~ (fedora) ]]; then
         local _packages=(docker docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin curl dialog freerdp git iproute libnotify nmap-ncat)
     elif [[ "$ID" =~ ^(arch|cachyos)$ ]] || [[ "$ID_LIKE" == *arch* ]] || [[ "$ID_LIKE" == *archlinux* ]]; then
