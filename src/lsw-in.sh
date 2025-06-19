@@ -115,6 +115,7 @@ winapp_config () {
     mkdir -p .config/winapps
     mv winapps.conf .config/winapps/
     mv compose.yaml .config/winapps/
+    sleep 1
     docker compose --file ~/.config/winapps/compose.yaml stop
     docker compose --file ~/.config/winapps/compose.yaml start
     local title="LSW"
