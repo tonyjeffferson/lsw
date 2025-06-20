@@ -67,6 +67,9 @@ windocker () {
     _cdir=$(whiptail --inputbox "Enter location for Windows installation. Leave empty for ${HOME}/Windows." 10 30 3>&1 1>&2 2>&3)
     if [ -z "$_cdir" ]; then
         mkdir -p Windows
+        if [[ "$ID_LIKE" =~ (rhel|fedora|suse) ]] || [[ "$ID" =~ (fedora|suse) ]]; then
+            sudo chmod o+rx "${HOME}/Windows"
+        fi
         _windir="${HOME}/Windows"
     elif [ ! -d "$_cdir" ]; then
         local title="Error"
@@ -99,6 +102,9 @@ windocker () {
     sed -i "s|^\(\s*CPU_CORES:\s*\).*|\1\"${_wincpu}\"|" compose.yaml
     sed -i "s|^\(\s*device:\s*\).*|\1\"${_windir}\"|" compose.yaml
     sed -i "s|^\(\s*DISK_SIZE:\s*\).*|\1\"${_winsize}\"|" compose.yaml
+    if [[ "$ID_LIKE" =~ (rhel|fedora|suse) ]] || [[ "$ID" =~ (fedora|suse) ]]; then
+        sed -i "s|^\(\s*o:\s*\)'bind'|\1'bind,z'|" compose.yaml
+    fi
     if command -v konsole &> /dev/null; then
         setsid konsole --noclose -e  "sudo docker compose --file ./compose.yaml up" >/dev/null 2>&1 < /dev/null &
     elif command -v gnome-terminal &> /dev/null; then
