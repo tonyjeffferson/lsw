@@ -135,6 +135,7 @@ winapp_config () {
     sleep 1
     docker compose --file ~/.config/winapps/compose.yaml stop
     docker compose --file ~/.config/winapps/compose.yaml start
+    sleep 10
     local title="LSW"
     local msg="Now a test for RDP will be performed. It should show you the Windows 10 subsystem in a window, and it is safe to close once it logs in."
     _msgbox_
