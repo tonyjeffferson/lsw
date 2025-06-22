@@ -179,14 +179,29 @@ lsw_menu () {
 
 }
 
-# runtime
-. /etc/os-release
-source <(curl -s https://raw.githubusercontent.com/psygreg/linuxtoys/refs/heads/main/src/linuxtoys.lib)
-# step 1 - docker setup
-if [ -e /dev/kvm ]; then
-    selinux_det
-    depcheck
-    windocker
+rmlsw () {
+
+    if whiptail --title "Setup" --yesno "Do you want to revert all changes? WARNING: This will ERASE all Docker Compose data!" 8 78; then
+        bash <(curl https://raw.githubusercontent.com/winapps-org/winapps/main/setup.sh)
+        docker compose --file ~/.config/winapps/compose.yaml stop
+        sleep 2
+        docker compose down --rmi=all --volumes
+        sudo rm /usr/bin/lsw-on*
+        sudo rm /usr/bin/lsw-off*
+        sudo rm /usr/bin/lsw-refresh*
+        sudo rm /usr/share/applications/lsw-on.desktop
+        sudo rm /usr/share/applications/lsw-off.desktop
+        sudo rm /usr/share/applications/lsw-refresh.desktop
+        rm -rf ~/.config/winapps
+        exit 0
+    else
+        return
+    fi
+
+}
+
+winapps_cfg () {
+
     # step 2 - winapps config
     if whiptail --title "Setup" --yesno "Is the Windows installation finished?" 8 78; then
         winapp_config
@@ -198,6 +213,37 @@ if [ -e /dev/kvm ]; then
             exit 1
         fi
     fi
+
+}
+
+# runtime
+. /etc/os-release
+source <(curl -s https://raw.githubusercontent.com/psygreg/linuxtoys/refs/heads/main/src/linuxtoys.lib)
+# step 1 - docker setup
+if [ -e /dev/kvm ]; then
+    selinux_det
+    depcheck
+    # menu
+    while :; do
+
+        CHOICE=$(whiptail --title "LSW" --menu "Linux Subsystem for Windows:" 25 78 16 \
+            "0" "Install" \
+            "1" "Uninstall" \
+            "2" "Cancel" 3>&1 1>&2 2>&3)
+
+        exitstatus=$?
+        if [ $exitstatus != 0 ]; then
+            # Exit the script if the user presses Esc
+            break
+        fi
+
+        case $CHOICE in
+        0) windocker && winapps_cfg && break ;;
+        1) rmlsw && break ;;
+        2 | q) break ;;
+        *) echo "Invalid Option" ;;
+        esac
+    done
 else
     title="LSW"
     msg="KVM unavailable. Enable Intel VT-x or AMD SVM on BIOS and try again."
