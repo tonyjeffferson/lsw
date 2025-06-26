@@ -20,12 +20,21 @@ selinux_det () {
 # check dependencies
 depcheck () {
 
-    if [[ "$ID_LIKE" == *debian* ]] || [[ "$ID_LIKE" == *ubuntu* ]] || [ "$ID" == "ubuntu" ]; then
-        local _packages=(docker.io docker-compose docker-compose-plugin curl dialog freerdp3-x11 git iproute2 libnotify-bin netcat-openbsd)
-    elif [ "$ID" == "debian" ]; then
-        local _packages=(docker.io docker-compose curl dialog freerdp3-x11 git iproute2 libnotify-bin netcat-openbsd)
+    if [[ "$ID_LIKE" == *debian* ]] || [[ "$ID_LIKE" == *ubuntu* ]] || [ "$ID" == "ubuntu" ] || [ "$ID" == "debian" ]; then
+        local _packages=(docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin dialog freerdp3-x11 git iproute2 libnotify-bin netcat-openbsd)
+        insta ca-certificates curl
+        sudo install -m 0755 -d /etc/apt/keyrings
+        sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+        sudo chmod a+r /etc/apt/keyrings/docker.asc
+        echo \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+            $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+            sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        sudo apt update
     elif [[ "$ID_LIKE" =~ (rhel|fedora) ]] || [[ "$ID" =~ (fedora) ]]; then
-        local _packages=(docker docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin curl dialog freerdp git iproute libnotify nmap-ncat)
+        sudo dnf -y install dnf-plugins-core
+        sudo dnf-3 config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+        local _packages=(docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin curl dialog freerdp git iproute libnotify nmap-ncat)
     elif [[ "$ID" =~ ^(arch|cachyos)$ ]] || [[ "$ID_LIKE" == *arch* ]] || [[ "$ID_LIKE" == *archlinux* ]]; then
         local _packages=(docker docker-compose curl dialog freerdp git iproute2 libnotify gnu-netcat)
     elif [ "$ID_LIKE" == "suse" ] || [ "$ID" == "suse" ]; then
@@ -33,8 +42,7 @@ depcheck () {
     fi
     _install_
     sudo usermod -aG docker $USER
-    sudo systemctl enable docker
-    sudo systemctl start docker
+    sudo systemctl enable --now docker
     sleep 2
 
 }
