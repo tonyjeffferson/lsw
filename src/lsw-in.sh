@@ -52,7 +52,9 @@ depcheck () {
         local _packages=(docker docker-compose curl dialog freerdp git iproute2 libnotify-tools netcat-openbsd)
     fi
     _install_
+    sudo groupadd docker
     sudo usermod -aG docker $USER
+    newgrp docker
     sudo systemctl enable --now docker
     sleep 2
 
@@ -160,7 +162,7 @@ winapp_config () {
     local msg="Now a test for RDP will be performed. It should show you the Windows 10 subsystem in a window, and it is safe to close once it logs in."
     _msgbox_
     xfreerdp3 /u:"lsw" /p:"lsw" /v:127.0.0.1 /cert:tofu
-    sleep 5
+    sleep 10
     bash <(curl https://raw.githubusercontent.com/winapps-org/winapps/main/setup.sh)
 
 }
