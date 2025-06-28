@@ -52,11 +52,7 @@ depcheck () {
         local _packages=(docker docker-compose curl dialog freerdp git iproute2 libnotify-tools netcat-openbsd)
     fi
     _install_
-    if ! getent group docker > /dev/null; then
-        sudo groupadd docker
-    fi
     sudo usermod -aG docker $USER
-    newgrp docker
     sudo systemctl enable --now docker
     sleep 2
 
