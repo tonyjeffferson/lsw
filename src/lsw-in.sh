@@ -21,7 +21,7 @@ selinux_det () {
 depcheck () {
 
     if [[ "$ID_LIKE" == *debian* ]] || [[ "$ID_LIKE" == *ubuntu* ]] || [ "$ID" == "ubuntu" ]; then
-        local _packages=(docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin dialog freerdp3-x11 git iproute2 libnotify-bin netcat-openbsd)
+        local _packages=(docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin dialog freerdp3-sdl git iproute2 libnotify-bin netcat-openbsd)
         insta ca-certificates curl
         sudo install -m 0755 -d /etc/apt/keyrings
         sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
@@ -32,7 +32,7 @@ depcheck () {
             sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
         sudo apt update
     elif [ "$ID" == "debian" ]; then
-        local _packages=(docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin dialog freerdp3-x11 git iproute2 libnotify-bin netcat-openbsd)
+        local _packages=(docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin dialog freerdp3-sdl git iproute2 libnotify-bin netcat-openbsd)
         insta ca-certificates curl
         sudo install -m 0755 -d /etc/apt/keyrings
         sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
@@ -148,6 +148,10 @@ windocker () {
 # configure winapps
 winapp_config () {
 
+    if [[ "$ID_LIKE" == *debian* ]] || [[ "$ID_LIKE" == *ubuntu* ]] || [ "$ID" == "ubuntu" ] || [ "$ID" == "debian" ]; then
+        local _packages=(freerdp3-x11)
+        _install_
+    fi
     cd $HOME
     wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/winapps.conf
     mkdir -p .config/winapps
@@ -182,6 +186,8 @@ lsw_menu () {
     wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-off.png
     wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-on.png
     wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-refresh.png
+    wget wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-desktop.desktop
+    wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-desktop.png
     sleep 1
     sudo mv *.desktop /usr/share/applications/
     sudo mv *.sh /usr/bin/
@@ -221,11 +227,10 @@ rmlsw () {
 
 }
 
-winapps_cfg () {
+lswcfg () {
 
     # step 2 - winapps config
     if whiptail --title "Setup" --yesno "Is the Windows installation finished?" 8 78; then
-        winapp_config
         lsw_menu
         exit 0
     else
@@ -248,9 +253,10 @@ if [ -e /dev/kvm ]; then
     while :; do
 
         CHOICE=$(whiptail --title "LSW" --menu "Linux Subsystem for Windows:" 25 78 16 \
-            "0" "Install" \
-            "1" "Uninstall" \
-            "2" "Cancel" 3>&1 1>&2 2>&3)
+            "0" "Install Standalone" \
+            "1" "Install WinApps" \
+            "2" "Uninstall" \
+            "3" "Cancel" 3>&1 1>&2 2>&3)
 
         exitstatus=$?
         if [ $exitstatus != 0 ]; then
@@ -259,9 +265,10 @@ if [ -e /dev/kvm ]; then
         fi
 
         case $CHOICE in
-        0) windocker && winapps_cfg && break ;;
-        1) rmlsw && break ;;
-        2 | q) break ;;
+        0) windocker && lswcfg ;;
+        1) winapp_config ;;
+        2) rmlsw && break ;;
+        3 | q) break ;;
         *) echo "Invalid Option" ;;
         esac
     done
