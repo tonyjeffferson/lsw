@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=LSWin
 Type=Application
-Exec=sdl-freerdp3 /v:127.0.0.1:3389 /cert:tofu /u:"lsw" /p:"lsw" /scale:100 +home-drive  +dynamic-resolution /sound /microphone /dvc:rdpecam
+Exec=sdl-freerdp3 /v:127.0.0.1:3389 /cert:tofu /u:"lsw" /p:"lsw" /scale:100 +home-drive  +dynamic-resolution /sound /microphone
 Terminal=false
 Icon=/usr/bin/lsw-desktop.png
 Comment=Windows Desktop
