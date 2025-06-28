@@ -250,7 +250,6 @@ source <(curl -s https://raw.githubusercontent.com/psygreg/linuxtoys/refs/heads/
 # step 1 - docker setup
 if [ -e /dev/kvm ]; then
     selinux_det
-    depcheck
     # menu
     while :; do
 
@@ -267,7 +266,7 @@ if [ -e /dev/kvm ]; then
         fi
 
         case $CHOICE in
-        0) windocker && lswcfg ;;
+        0) depcheck && windocker && lswcfg ;;
         1) winapp_config ;;
         2) rmlsw && break ;;
         3 | q) break ;;
