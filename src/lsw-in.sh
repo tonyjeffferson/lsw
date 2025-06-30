@@ -20,6 +20,35 @@ selinux_det () {
 # check dependencies
 depcheck () {
 
+    # Enforce minimum RAM check
+    local total_kb=$(grep MemTotal /proc/meminfo | awk '{ print $2 }')
+    local available_kb=$(grep MemAvailable /proc/meminfo | awk '{ print $2 }')
+    local total_gb=$(( total_kb / 1024 / 1024 ))
+    local available_gb=$(( available_kb / 1024 / 1024 ))
+    _cram=$(( total_gb / 3 ))
+    if (( _cram < 4 )); then
+        local title="Error"
+        local msg="System RAM too low. At least 12GB total is required to continue."
+        _msgbox_
+        exit 1
+    fi
+    # Enforce availability with 1GB buffer (to avoid rounding issues)
+    if (( available_gb < (_cram + 1) )); then
+        local title="Error"
+        local msg="Not enough free RAM. Close some applications and try again."
+        _msgbox_
+        exit 1
+    fi
+    # CPU thread check
+    local _total_threads=$(nproc)
+    _ccpu=$(( _total_threads / 2 ))
+    if (( _ccpu < 2 )); then
+        local title="Error"
+        local msg="Not enough CPU threads to install Windows hypervisor, minimum 4."
+        _msgbox_
+        exit 6
+    fi
+    # install dependencies
     if [[ "$ID_LIKE" == *debian* ]] || [[ "$ID_LIKE" == *ubuntu* ]] || [ "$ID" == "ubuntu" ]; then
         local _packages=(docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin dialog freerdp3-sdl git iproute2 libnotify-bin netcat-openbsd)
         insta ca-certificates curl
@@ -65,40 +94,15 @@ windocker () {
     cd $HOME
     wget -nc https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/compose.yaml
     # make necessary adjustments to compose file
-    local total_kb=$(grep MemTotal /proc/meminfo | awk '{ print $2 }')
-    local available_kb=$(grep MemAvailable /proc/meminfo | awk '{ print $2 }')
-    local total_gb=$(( total_kb / 1024 / 1024 ))
-    local available_gb=$(( available_kb / 1024 / 1024 ))
-    _cram=$(( total_gb / 3 ))
-    # Enforce minimum
-    if (( _cram < 4 )); then
-        local title="Error"
-        local msg="System RAM too low. At least 12GB total is required to continue."
-        _msgbox_
-        exit 1
-    fi
-    # Enforce availability with 1GB buffer (to avoid rounding issues)
-    if (( available_gb < (_cram + 1) )); then
-        local title="Error"
-        local msg="Not enough free RAM. Close some applications and try again."
-        _msgbox_
-        exit 1
-    fi
     # Cap at 16GB
     if (( _cram > 16 )); then
         _winram=16
     else
         _winram=$_cram
     fi
-    local _total_threads=$(nproc)
-    _ccpu=$(( _total_threads / 2 ))
-    if (( _ccpu < 2 )); then
-        local title="Error"
-        local msg="Not enough space to install Windows, minimum 40GB."
-        _msgbox_
-        exit 6
-    fi
+    # get cpu threads
     _wincpu="$_ccpu"
+    # get directory
     _cdir=""
     _cdir=$(whiptail --inputbox "Enter location for Windows installation. Leave empty for ${HOME}/Windows." 10 30 3>&1 1>&2 2>&3)
     if [ -z "$_cdir" ]; then
