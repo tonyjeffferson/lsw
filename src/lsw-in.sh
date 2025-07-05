@@ -77,7 +77,7 @@ depcheck () {
         local _packages=(docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin curl dialog freerdp git iproute libnotify nmap-ncat)
     elif [[ "$ID" =~ ^(arch|cachyos)$ ]] || [[ "$ID_LIKE" == *arch* ]] || [[ "$ID_LIKE" == *archlinux* ]]; then
         local _packages=(docker docker-compose curl dialog freerdp git iproute2 libnotify gnu-netcat)
-    elif [ "$ID_LIKE" == "suse" ] || [ "$ID" == "suse" ]; then
+    elif [[ "$ID_LIKE" == *suse* ]]; then
         local _packages=(docker docker-compose curl dialog freerdp git iproute2 libnotify-tools netcat-openbsd)
     fi
     _install_
