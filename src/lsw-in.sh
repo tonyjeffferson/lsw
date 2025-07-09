@@ -176,6 +176,7 @@ winapp_config () {
 lsw_menu () {
 
     cd $HOME
+    mkdir -p .config/winapps
     mv compose.yaml .config/winapps/
     sleep 2
     mkdir -p lsw
