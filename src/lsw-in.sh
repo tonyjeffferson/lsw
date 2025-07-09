@@ -158,7 +158,6 @@ winapp_config () {
     wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/winapps.conf
     mkdir -p .config/winapps
     mv winapps.conf .config/winapps/
-    mv compose.yaml .config/winapps/
     sleep 2
     docker compose --file ~/.config/winapps/compose.yaml stop
     sleep 2
@@ -177,6 +176,8 @@ winapp_config () {
 lsw_menu () {
 
     cd $HOME
+    mv compose.yaml .config/winapps/
+    sleep 2
     mkdir -p lsw
     cd lsw
     wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-off.desktop
