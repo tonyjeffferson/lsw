@@ -50,7 +50,13 @@ depcheck () {
     fi
     # install dependencies
     if [[ "$ID_LIKE" == *debian* ]] || [[ "$ID_LIKE" == *ubuntu* ]] || [ "$ID" == "ubuntu" ]; then
-        local _packages=(docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin dialog freerdp3-sdl git iproute2 libnotify-bin netcat-openbsd)
+        declare -a _packages=()
+        _packages+=("docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin dialog git iproute2 libnotify-bin netcat-openbsd")
+        if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
+            _packages+=("freerdp3-sdl")
+        else
+            _packages+=("freerdp3-x11")
+        fi
         insta ca-certificates curl
         sudo install -m 0755 -d /etc/apt/keyrings
         sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
@@ -61,7 +67,13 @@ depcheck () {
             sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
         sudo apt update
     elif [ "$ID" == "debian" ]; then
-        local _packages=(docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin dialog freerdp3-sdl git iproute2 libnotify-bin netcat-openbsd)
+        declare -a _packages=()
+        _packages+=("docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin dialog git iproute2 libnotify-bin netcat-openbsd")
+        if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
+            _packages+=("freerdp3-sdl")
+        else
+            _packages+=("freerdp3-x11")
+        fi
         insta ca-certificates curl
         sudo install -m 0755 -d /etc/apt/keyrings
         sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
@@ -154,10 +166,10 @@ winapp_config () {
         local _packages=(freerdp3-x11)
         _install_
     fi
-    cd $HOME
+    mkdir -p $HOME/.config/winapps
+    cd $HOME/.config/winapps
     wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/winapps.conf
-    mkdir -p .config/winapps
-    mv winapps.conf .config/winapps/
+    cd $HOME
     sleep 2
     docker compose --file ~/.config/winapps/compose.yaml stop
     sleep 2
@@ -176,8 +188,9 @@ winapp_config () {
 lsw_menu () {
 
     cd $HOME
-    mkdir -p .config/winapps
-    mv compose.yaml .config/winapps/
+    mkdir -p $HOME/.config/winapps
+    cp -f compose.yaml $HOME/.config/winapps/
+    rm compose.yaml
     sleep 2
     mkdir -p lsw
     cd lsw
@@ -190,7 +203,11 @@ lsw_menu () {
     wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-off.png
     wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-on.png
     wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-refresh.png
-    wget wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-desktop.desktop
+    if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
+        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-desktop.desktop
+    else
+        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-desktop-x11.desktop
+    fi
     wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-desktop.png
     sleep 1
     sudo mv *.desktop /usr/share/applications/
