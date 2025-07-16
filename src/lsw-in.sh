@@ -133,9 +133,16 @@ windocker () {
     if [ -z "$_csize" ]; then
         _winsize="100"
     else
+        # stop if input size is not a number
+        if [[ -n "$_csize" && ! "$_csize" =~ ^[0-9]+$ ]]; then
+            local title="Error"
+            local msg="Invalid number for disk size."
+            _msgbox_
+            return 10
+        fi
         _winsize="$_csize"
     fi
-    if (( _winsize < "40" )); then
+    if (( _winsize < 40 )); then
         local title="Error"
         local msg="Not enough space to install Windows, minimum 40GB."
         _msgbox_
@@ -155,6 +162,11 @@ windocker () {
         setsid konsole --noclose -e  "sudo docker compose --file ./compose.yaml up" >/dev/null 2>&1 < /dev/null &
     elif command -v gnome-terminal &> /dev/null; then
         setsid gnome-terminal -- bash -c "sudo docker compose --file ./compose.yaml up; exec bash" >/dev/null 2>&1 < /dev/null &
+    else
+        local title="Error"
+        local msg="No compatible terminal emulator found to launch Docker Compose."
+        _msgbox_
+        exit 8
     fi
 
 }
