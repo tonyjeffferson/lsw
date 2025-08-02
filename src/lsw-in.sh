@@ -1,22 +1,5 @@
 #!/bin/bash
 
-# SELinux detector
-selinux_det () {
-
-    if command -v getenforce &> /dev/null; then
-        local selinux_status=$(getenforce)
-        if [[ "$selinux_status" == "Enforcing" || "$selinux_status" == "Permissive" ]]; then
-            title="LSW"
-            msg="LSW is not compatible with SELinux. Aborting..."
-            _msgbox_
-            exit 7
-        else
-            return
-        fi
-    fi
-
-}
-
 # check dependencies
 depcheck () {
 
@@ -99,11 +82,72 @@ depcheck () {
 
 }
 
+# use port from LT Atom for SELinux compatibility
+lsw_selinux () {
+
+    local _packages=(dialog netcat freerdp iproute libnotify)
+	_install_
+	cd $HOME/.config/winapps
+	wget -nc https://raw.githubusercontent.com/psygreg/linuxtoys-atom/refs/heads/main/lsw-atom/winapps/compose.yaml
+	wget -nc https://raw.githubusercontent.com/psygreg/linuxtoys-atom/refs/heads/main/lsw-atom/winapps/winapps.conf
+	# make necessary adjustments to compose file
+    # Cap at 16GB
+    if (( _cram > 16 )); then
+        _winram=16
+    else
+        _winram=$_cram
+    fi
+    # get cpu threads
+    _wincpu="$_ccpu"
+    # get C size
+    _csize=$(zenity --entry --title="LSW" --text="Enter Windows disk (C:) size in GB. Leave empty to use 50GB."  --entry-text "50" --height=300 --width=300)
+    local available_gb=$(df -BG "/" | awk 'NR==2 { gsub("G","",$4); print $4 }')
+    if [ -z "$_csize" ]; then
+        _winsize="50"
+    else
+        # stop if input size is not a number
+		if [[ -n "$_csize" && ! "$_csize" =~ ^[0-9]+$ ]]; then
+			nonfatal "Invalid input for disk size. Please enter a number."
+            return 10
+        fi
+        _winsize="$_csize"
+    fi
+    if (( _winsize < 40 )); then
+		nonfatal "Minimum space to install Windows (C:) is 40GB."
+        return 11
+    fi
+    if (( available_gb < _winsize )); then\
+		nonfatal "Not enough disk space: ${_winsize} GB required, ${available_gb} GB available."
+        exit 3
+    fi
+    sed -i "s|^\(\s*RAM_SIZE:\s*\).*|\1\"${_winram}G\"|" compose.yaml
+    sed -i "s|^\(\s*CPU_CORES:\s*\).*|\1\"${_wincpu}\"|" compose.yaml
+    sed -i "s|^\(\s*DISK_SIZE:\s*\).*|\1\"${_winsize}\"|" compose.yaml
+	if command -v konsole &> /dev/null; then
+        setsid konsole --noclose -e  "sudo docker compose --file ./compose.yaml up" >/dev/null 2>&1 < /dev/null &
+	elif command -v ptyxis &> /dev/null; then
+		setsid ptyxis bash -c "sudo docker compose --file ./compose.yaml up; exec bash" >/dev/null 2>&1 < /dev/null &
+    elif command -v gnome-terminal &> /dev/null; then
+        setsid gnome-terminal -- bash -c "sudo docker compose --file ./compose.yaml up; exec bash" >/dev/null 2>&1 < /dev/null &
+    else
+		nonfatal "No compatible terminal emulator found to launch Docker Compose."
+        exit 4
+    fi
+
+}
+
 # install windows on docker
 windocker () {
 
     # get compose file
     cd $HOME
+    if command -v getenforce &> /dev/null; then
+        local selinux_status=$(getenforce)
+        if [[ "$selinux_status" == "Enforcing" || "$selinux_status" == "Permissive" ]]; then
+            lsw_selinux
+            return 0
+        fi
+    fi
     wget -nc https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/compose.yaml
     # make necessary adjustments to compose file
     # Cap at 16GB
@@ -280,7 +324,6 @@ lswcfg () {
 source <(curl -s https://raw.githubusercontent.com/psygreg/linuxtoys/refs/heads/main/src/linuxtoys.lib)
 # step 1 - docker setup
 if [ -e /dev/kvm ]; then
-    selinux_det
     # menu
     while :; do
 
