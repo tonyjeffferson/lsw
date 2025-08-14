@@ -10,25 +10,19 @@ depcheck () {
     local available_gb=$(( available_kb / 1024 / 1024 ))
     _cram=$(( total_gb / 3 ))
     if (( _cram < 4 )); then
-        local title="Error"
-        local msg="System RAM too low. At least 12GB total is required to continue."
-        _msgbox_
+        fatal "System RAM too low. At least 12GB total is required to continue."
         exit 1
     fi
     # Enforce availability with 1GB buffer (to avoid rounding issues)
     if (( available_gb < (_cram + 1) )); then
-        local title="Error"
-        local msg="Not enough free RAM. Close some applications and try again."
-        _msgbox_
+        fatal "Not enough free RAM. Close some applications and try again."
         exit 1
     fi
     # CPU thread check
     local _total_threads=$(nproc)
     _ccpu=$(( _total_threads / 2 ))
     if (( _ccpu < 2 )); then
-        local title="Error"
-        local msg="Not enough CPU threads to install Windows hypervisor, minimum 4."
-        _msgbox_
+        fatal "Not enough CPU threads to install Windows hypervisor, minimum 4."
         exit 6
     fi
     # install dependencies
@@ -160,42 +154,34 @@ windocker () {
     _wincpu="$_ccpu"
     # get directory
     _cdir=""
-    _cdir=$(whiptail --inputbox "Enter location for Windows installation. Leave empty for ${HOME}/Windows." 10 30 3>&1 1>&2 2>&3)
+    _cdir=$(zenity --entry --title="LSW" --text="Enter location for Windows installation. Leave empty for ${HOME}/Windows." --entry-text "${HOME}/Windows" --height=300 --width=360)
     if [ -z "$_cdir" ]; then
         mkdir -p Windows
         _windir="${HOME}/Windows"
     elif [ ! -d "$_cdir" ]; then
-        local title="Error"
-        local msg="Invalid path for installation, try again."
-        _msgbox_
+        fatal "Invalid path for installation, try again."
         exit 2
     else
         _windir="$_cdir"
     fi
-    _csize=$(whiptail --inputbox "Enter Windows disk (C:) size in GB. Leave empty to use 100GB." 10 30 3>&1 1>&2 2>&3)
+    _csize=$(zenity --entry --title="LSW" --text="Enter Windows disk (C:) size in GB. Leave empty to use 50GB." --entry-text "50" --height=300 --width=360)
     local available_gb=$(df -BG "$_windir" | awk 'NR==2 { gsub("G","",$4); print $4 }')
     if [ -z "$_csize" ]; then
-        _winsize="100"
+        _winsize="50"
     else
         # stop if input size is not a number
         if [[ -n "$_csize" && ! "$_csize" =~ ^[0-9]+$ ]]; then
-            local title="Error"
-            local msg="Invalid number for disk size."
-            _msgbox_
+            fatal "Invalid number for disk size."
             return 10
         fi
         _winsize="$_csize"
     fi
     if (( _winsize < 40 )); then
-        local title="Error"
-        local msg="Not enough space to install Windows, minimum 40GB."
-        _msgbox_
+        fatal "Not enough space to install Windows, minimum 40GB."
         exit 4
     fi
     if (( available_gb < _winsize )); then
-        local title="Error"
-        local msg="Not enough disk space in $_cdir: ${_winsize} GB required, ${available_gb} GB available."
-        _msgbox_
+        fatal "Not enough disk space in $_cdir: ${_winsize} GB required, ${available_gb} GB available."
         exit 3
     fi
     sed -i "s|^\(\s*RAM_SIZE:\s*\).*|\1\"${_winram}G\"|" compose.yaml
@@ -207,9 +193,7 @@ windocker () {
     elif command -v gnome-terminal &> /dev/null; then
         setsid gnome-terminal -- bash -c "sudo docker compose --file ./compose.yaml up; exec bash" >/dev/null 2>&1 < /dev/null &
     else
-        local title="Error"
-        local msg="No compatible terminal emulator found to launch Docker Compose."
-        _msgbox_
+        fatal "No compatible terminal emulator found to launch Docker Compose."
         exit 8
     fi
 
@@ -231,9 +215,7 @@ winapp_config () {
     sleep 2
     docker compose --file ~/.config/winapps/compose.yaml start
     sleep 10
-    local title="LSW"
-    local msg="Now a test for RDP will be performed. It should show you the Windows 10 subsystem in a window, and it is safe to close once it logs in."
-    _msgbox_
+    zenity --info --text "Now a test for RDP will be performed. It should show you the Windows 10 subsystem in a window, and it is safe to close once it logs in." --width 360 --height 300
     xfreerdp3 /u:"lsw" /p:"lsw" /v:127.0.0.1 /cert:tofu
     sleep 10
     bash <(curl https://raw.githubusercontent.com/winapps-org/winapps/main/setup.sh)
@@ -277,15 +259,12 @@ lsw_menu () {
     cd $HOME
     sleep 1
     rm -rf lsw
-    local title="LSW"
-    local msg="All done. Enjoy your Windows apps."
-    _msgbox_
-
+    zeninf "All done. Enjoy your Windows apps."
 }
 
 rmlsw () {
 
-    if whiptail --title "Setup" --yesno "Do you want to revert all changes? WARNING: This will ERASE all Docker Compose data!" 8 78; then
+    if zenity --question --text "Do you want to revert all changes? WARNING: This will ERASE all Docker Compose data!" --width 360 --height 300; then
         bash <(curl https://raw.githubusercontent.com/winapps-org/winapps/main/setup.sh)
         docker compose --file ~/.config/winapps/compose.yaml stop
         sleep 2
@@ -307,11 +286,11 @@ rmlsw () {
 lswcfg () {
 
     # step 2 - winapps config
-    if whiptail --title "Setup" --yesno "Is the Windows installation finished?" 8 78; then
+    if zenity --question --text "Is the Windows installation finished?" --width 360 --height 300; then
         lsw_menu
         exit 0
     else
-        if whiptail --title "Setup" --yesno "Do you want to revert all changes? WARNING: This will ERASE all Docker Compose data!" 8 78; then
+        if zenity --question --text "Do you want to revert all changes? WARNING: This will ERASE all Docker Compose data!" --width 360 --height 300; then
             docker compose down --rmi=all --volumes
             exit 1
         fi
@@ -321,20 +300,21 @@ lswcfg () {
 
 # runtime
 . /etc/os-release
+# TODO FIX SOURCE WHEN LT5 COMES OUT!!
 source <(curl -s https://raw.githubusercontent.com/psygreg/linuxtoys/refs/heads/main/src/linuxtoys.lib)
 # step 1 - docker setup
 if [ -e /dev/kvm ]; then
     # menu
-    while :; do
+    while true; do
+        CHOICE=$(zenity --list --title="LSW" --text="Linux Subsystem for Windows:" \
+            --column="Option" \
+            "Install Standalone" \
+            "Install WinApps" \
+            "Uninstall" \
+            "Cancel" \
+            --width 300 --height 330)
 
-        CHOICE=$(whiptail --title "LSW" --menu "Linux Subsystem for Windows:" 25 78 16 \
-            "0" "Install Standalone" \
-            "1" "Install WinApps" \
-            "2" "Uninstall" \
-            "3" "Cancel" 3>&1 1>&2 2>&3)
-
-        exitstatus=$?
-        if [ $exitstatus != 0 ]; then
+        if [ $? -ne 0 ]; then
             # Exit the script if the user presses Esc
             break
         fi
@@ -348,8 +328,6 @@ if [ -e /dev/kvm ]; then
         esac
     done
 else
-    title="LSW"
-    msg="KVM unavailable. Enable Intel VT-x or AMD SVM on BIOS and try again."
-    _msgbox_
+    zenwrn "KVM unavailable. Enable Intel VT-x or AMD SVM on BIOS and try again."
     exit 5
 fi
