@@ -226,22 +226,38 @@ winapp_config () {
 # configure LSW menu entries
 lsw_menu () {
 
-    cd $HOME
-    mkdir -p $HOME/.config/winapps
-    cp -f compose.yaml $HOME/.config/winapps/
-    rm compose.yaml
-    sleep 2
-    mkdir -p lsw
-    cd lsw
-    wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-off.desktop
-    wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-on.desktop
-    wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-refresh.desktop
-    wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-off.sh
-    wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-on.sh
-    wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-refresh.sh
-    wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-off.png
-    wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-on.png
-    wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-refresh.png
+    local selinux_status=$(getenforce)
+    if [[ "$selinux_status" == "Enforcing" || "$selinux_status" == "Permissive" ]]; then
+        cd $HOME
+        mkdir -p lsw
+        cd lsw
+        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-off.desktop
+        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-on.desktop
+        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-refresh.desktop
+        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-selinux/lsw-off.sh
+        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-selinux/lsw-on.sh
+        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-selinux/lsw-refresh.sh
+        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-off.png
+        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-on.png
+        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-refresh.png
+    else
+        cd $HOME
+        mkdir -p $HOME/.config/winapps
+        cp -f compose.yaml $HOME/.config/winapps/
+        rm compose.yaml
+        sleep 2
+        mkdir -p lsw
+        cd lsw
+        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-off.desktop
+        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-on.desktop
+        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-refresh.desktop
+        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-off.sh
+        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-on.sh
+        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-refresh.sh
+        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-off.png
+        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-on.png
+        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-refresh.png
+    fi
     if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
         wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-desktop.desktop
     else
@@ -249,7 +265,7 @@ lsw_menu () {
     fi
     wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-desktop.png
     sleep 1
-    sudo mv *.desktop /usr/share/applications/
+    mv *.desktop $HOME/.local/share/applications/
     sudo mv *.sh /usr/bin/
     sudo mv *.png /usr/bin/
     cd /usr/bin
