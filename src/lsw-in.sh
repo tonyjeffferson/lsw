@@ -315,15 +315,14 @@ if [ -e /dev/kvm ]; then
             --width 300 --height 330)
 
         if [ $? -ne 0 ]; then
-            # Exit the script if the user presses Esc
             break
         fi
 
         case $CHOICE in
-        0) depcheck && windocker && lswcfg ;;
-        1) winapp_config ;;
-        2) rmlsw && break ;;
-        3 | q) break ;;
+        "Install Standalone") depcheck && windocker && lswcfg ;;
+        "Install WinApps") winapp_config ;;
+        "Uninstall") rmlsw && break ;;
+        "Cancel") break ;;
         *) echo "Invalid Option" ;;
         esac
     done
