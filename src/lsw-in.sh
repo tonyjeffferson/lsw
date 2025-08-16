@@ -79,7 +79,11 @@ depcheck () {
 # use port from LT Atom for SELinux compatibility
 lsw_selinux () {
 
-    local _packages=(dialog netcat freerdp iproute libnotify)
+    if [[ "$ID" =~ "suse" ]] || [[ "$ID_LIKE" =~ "suse" ]]; then
+        local _packages=(dialog netcat freerdp freerdp-sdl iproute libnotify)
+    else
+        local _packages=(dialog netcat freerdp iproute libnotify)
+    fi
 	_install_
     mkdir -p $HOME/.config/winapps
 	cd $HOME/.config/winapps
@@ -259,7 +263,11 @@ lsw_menu () {
         wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-refresh.png
     fi
     if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
-        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-desktop.desktop
+        if [[ "$ID" =~ "suse" ]] || [[ "$ID_LIKE" =~ "suse" ]]; then
+            wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-suse/lsw-desktop.desktop
+        else
+            wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-desktop.desktop
+        fi
     else
         wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-desktop-x11.desktop
     fi
