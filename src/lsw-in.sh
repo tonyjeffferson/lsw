@@ -343,9 +343,9 @@ if [ -e /dev/kvm ]; then
         fi
 
         case $CHOICE in
-        "Install Standalone") depcheck && windocker && lswcfg ;;
-        "Install WinApps") winapp_config ;;
-        "Uninstall") rmlsw && break ;;
+        "Install Standalone") sudo_rq && depcheck && windocker && lswcfg ;;
+        "Install WinApps") sudo_rq && winapp_config ;;
+        "Uninstall") sudo_rq && rmlsw && break ;;
         "Cancel") break ;;
         *) echo "Invalid Option" ;;
         esac
