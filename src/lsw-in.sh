@@ -325,8 +325,7 @@ lswcfg () {
 
 # runtime
 . /etc/os-release
-# TODO FIX SOURCE WHEN LT5 COMES OUT!!
-source <(curl -s https://raw.githubusercontent.com/psygreg/linuxtoys/refs/heads/main/src/linuxtoys.lib)
+source <(curl -s https://raw.githubusercontent.com/psygreg/linuxtoys/refs/heads/master/p3/libs/linuxtoys.lib)
 # step 1 - docker setup
 if [ -e /dev/kvm ]; then
     # menu
