@@ -28,11 +28,11 @@ depcheck () {
     # install dependencies
     if [[ "$ID_LIKE" == *debian* ]] || [[ "$ID_LIKE" == *ubuntu* ]] || [ "$ID" == "ubuntu" ]; then
         declare -a _packages=()
-        _packages+=("docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin dialog git iproute2 libnotify-bin netcat-openbsd")
+        _packages+=(docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin dialog git iproute2 libnotify-bin netcat-openbsd)
         if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
-            _packages+=("freerdp3-sdl")
+            _packages+=(freerdp3-sdl)
         else
-            _packages+=("freerdp3-x11")
+            _packages+=(freerdp3-x11)
         fi
         insta ca-certificates curl
         sudo install -m 0755 -d /etc/apt/keyrings
@@ -45,11 +45,11 @@ depcheck () {
         sudo apt update
     elif [ "$ID" == "debian" ]; then
         declare -a _packages=()
-        _packages+=("docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin dialog git iproute2 libnotify-bin netcat-openbsd")
+        _packages+=(docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin dialog git iproute2 libnotify-bin netcat-openbsd)
         if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
-            _packages+=("freerdp3-sdl")
+            _packages+=(freerdp3-sdl)
         else
-            _packages+=("freerdp3-x11")
+            _packages+=(freerdp3-x11)
         fi
         insta ca-certificates curl
         sudo install -m 0755 -d /etc/apt/keyrings
