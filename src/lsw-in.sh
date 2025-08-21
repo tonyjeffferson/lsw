@@ -291,9 +291,9 @@ rmlsw () {
 
     if zenity --question --text "Do you want to revert all changes? WARNING: This will ERASE all Docker Compose data!" --width 360 --height 300; then
         bash <(curl https://raw.githubusercontent.com/winapps-org/winapps/main/setup.sh)
-        docker compose --file ~/.config/winapps/compose.yaml stop
+        sudo docker compose --file ~/.config/winapps/compose.yaml stop
         sleep 2
-        docker compose down --rmi=all --volumes
+        sudo docker compose down --rmi=all --volumes
         sudo rm /usr/bin/lsw-on*
         sudo rm /usr/bin/lsw-off*
         sudo rm /usr/bin/lsw-refresh*
