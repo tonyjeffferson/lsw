@@ -223,7 +223,7 @@ winapp_config () {
     zenity --info --text "Now a test for RDP will be performed. It should show you the Windows 10 subsystem in a window, and it is safe to close once it logs in." --width 360 --height 300
     xfreerdp3 /u:"lsw" /p:"lsw" /v:127.0.0.1 /cert:tofu
     sleep 10
-    bash <(curl https://raw.githubusercontent.com/winapps-org/winapps/main/setup.sh)
+    curl -fsSL https://raw.githubusercontent.com/winapps-org/winapps/main/setup.sh | bash
 
 }
 
