@@ -343,7 +343,7 @@ if [ -e /dev/kvm ]; then
         fi
 
         case $CHOICE in
-        "Install Standalone") sudo_rq && depcheck && windocker && lswcfg ;;
+        "Install Standalone") sudo_rq && depcheck && windocker && lsw_menu ;;
         "Install WinApps") sudo_rq && winapp_config ;;
         "Uninstall") sudo_rq && rmlsw && break ;;
         "Cancel") break ;;
