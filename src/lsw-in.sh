@@ -273,7 +273,7 @@ lsw_menu () {
     fi
     wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-desktop.png
     sleep 1
-    mv *.desktop $HOME/.local/share/applications/
+    sudo mv *.desktop /usr/share/applications/
     sudo mv *.sh /usr/bin/
     sudo mv *.png /usr/bin/
     cd /usr/bin
@@ -294,12 +294,12 @@ rmlsw () {
         sudo docker compose --file ~/.config/winapps/compose.yaml stop
         sleep 2
         sudo docker compose down --rmi=all --volumes
-        sudo rm /usr/bin/lsw-on*
-        sudo rm /usr/bin/lsw-off*
-        sudo rm /usr/bin/lsw-refresh*
-        sudo rm /usr/share/applications/lsw-on.desktop
-        sudo rm /usr/share/applications/lsw-off.desktop
-        sudo rm /usr/share/applications/lsw-refresh.desktop
+        sudo rm -f /usr/bin/lsw-on*
+        sudo rm -f /usr/bin/lsw-off*
+        sudo rm -f /usr/bin/lsw-refresh*
+        sudo rm -f /usr/share/applications/lsw-on.desktop
+        sudo rm -f /usr/share/applications/lsw-off.desktop
+        sudo rm -f /usr/share/applications/lsw-refresh.desktop
         rm -rf ~/.config/winapps
         exit 0
     else
