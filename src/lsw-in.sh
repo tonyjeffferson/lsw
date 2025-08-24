@@ -147,7 +147,7 @@ windocker () {
             return 0
         fi
     fi
-    wget -nc https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/compose.yaml
+    wget -nc https://raw.githubusercontent.com/tonyjeffferson/lsw/refs/heads/main/src/compose.yaml
     # make necessary adjustments to compose file
     # Cap at 16GB
     if (( _cram > 16 )); then
@@ -217,7 +217,7 @@ winapp_config () {
     fi
     mkdir -p $HOME/.config/winapps
     cd $HOME/.config/winapps
-    wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/winapps.conf
+    wget https://raw.githubusercontent.com/tonyjeffferson/lsw/refs/heads/main/src/winapps.conf
     cd $HOME
     sleep 2
     docker compose --file ~/.config/winapps/compose.yaml stop
@@ -239,15 +239,15 @@ lsw_menu () {
         cd $HOME
         mkdir -p lsw
         cd lsw
-        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-off.desktop
-        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-on.desktop
-        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-refresh.desktop
-        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-selinux/lsw-off.sh
-        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-selinux/lsw-on.sh
-        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-selinux/lsw-refresh.sh
-        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-off.png
-        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-on.png
-        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-refresh.png
+        wget https://raw.githubusercontent.com/tonyjeffferson/lsw/refs/heads/main/src/menu/lsw-off.desktop
+        wget https://raw.githubusercontent.com/tonyjeffferson/lsw/refs/heads/main/src/menu/lsw-on.desktop
+        wget https://raw.githubusercontent.com/tonyjeffferson/lsw/refs/heads/main/src/menu/lsw-refresh.desktop
+        wget https://raw.githubusercontent.com/tonyjeffferson/lsw/refs/heads/main/src/lsw-selinux/lsw-off.sh
+        wget https://raw.githubusercontent.com/tonyjeffferson/lsw/refs/heads/main/src/lsw-selinux/lsw-on.sh
+        wget https://raw.githubusercontent.com/tonyjeffferson/lsw/refs/heads/main/src/lsw-selinux/lsw-refresh.sh
+        wget https://raw.githubusercontent.com/tonyjeffferson/lsw/refs/heads/main/src/lsw-off.png
+        wget https://raw.githubusercontent.com/tonyjeffferson/lsw/refs/heads/main/src/lsw-on.png
+        wget https://raw.githubusercontent.com/tonyjeffferson/lsw/refs/heads/main/src/lsw-refresh.png
     else
         cd $HOME
         mkdir -p $HOME/.config/winapps
@@ -256,26 +256,26 @@ lsw_menu () {
         sleep 2
         mkdir -p lsw
         cd lsw
-        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-off.desktop
-        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-on.desktop
-        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-refresh.desktop
-        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-off.sh
-        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-on.sh
-        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-refresh.sh
-        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-off.png
-        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-on.png
-        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-refresh.png
+        wget https://raw.githubusercontent.com/tonyjeffferson/lsw/refs/heads/main/src/menu/lsw-off.desktop
+        wget https://raw.githubusercontent.com/tonyjeffferson/lsw/refs/heads/main/src/menu/lsw-on.desktop
+        wget https://raw.githubusercontent.com/tonyjeffferson/lsw/refs/heads/main/src/menu/lsw-refresh.desktop
+        wget https://raw.githubusercontent.com/tonyjeffferson/lsw/refs/heads/main/src/lsw-off.sh
+        wget https://raw.githubusercontent.com/tonyjeffferson/lsw/refs/heads/main/src/lsw-on.sh
+        wget https://raw.githubusercontent.com/tonyjeffferson/lsw/refs/heads/main/src/lsw-refresh.sh
+        wget https://raw.githubusercontent.com/tonyjeffferson/lsw/refs/heads/main/src/lsw-off.png
+        wget https://raw.githubusercontent.com/tonyjeffferson/lsw/refs/heads/main/src/lsw-on.png
+        wget https://raw.githubusercontent.com/tonyjeffferson/lsw/refs/heads/main/src/lsw-refresh.png
     fi
     if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
         if [[ "$ID" =~ "suse" ]] || [[ "$ID_LIKE" =~ "suse" ]]; then
-            wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-suse/lsw-desktop.desktop
+            wget https://raw.githubusercontent.com/tonyjeffferson/lsw/refs/heads/main/src/lsw-suse/lsw-desktop.desktop
         else
-            wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-desktop.desktop
+            wget https://raw.githubusercontent.com/tonyjeffferson/lsw/refs/heads/main/src/menu/lsw-desktop.desktop
         fi
     else
-        wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/menu/lsw-desktop-x11.desktop
+        wget https://raw.githubusercontent.com/tonyjeffferson/lsw/refs/heads/main/src/menu/lsw-desktop-x11.desktop
     fi
-    wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-desktop.png
+    wget https://raw.githubusercontent.com/tonyjeffferson/lsw/refs/heads/main/src/lsw-desktop.png
     sleep 1
     sudo_rq
     sudo mv *.desktop /usr/share/applications/
