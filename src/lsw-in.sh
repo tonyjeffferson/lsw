@@ -273,6 +273,7 @@ lsw_menu () {
     fi
     wget https://raw.githubusercontent.com/psygreg/lsw/refs/heads/main/src/lsw-desktop.png
     sleep 1
+    sudo_rq
     sudo mv *.desktop /usr/share/applications/
     sudo mv *.sh /usr/bin/
     sudo mv *.png /usr/bin/
