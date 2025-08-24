@@ -161,13 +161,17 @@ windocker () {
     _cdir=""
     _cdir=$(zenity --entry --title="LSW" --text="Enter location for Windows installation. Leave empty for ${HOME}/Windows." --entry-text "${HOME}/Windows" --height=300 --width=360)
     if [ -z "$_cdir" ]; then
-        mkdir -p Windows
         _windir="${HOME}/Windows"
-    elif [ ! -d "$_cdir" ]; then
-        fatal "Invalid path for installation, try again."
-        exit 2
+        mkdir -p "$_windir"
     else
         _windir="$_cdir"
+        # Create directory if it doesn't exist
+        mkdir -p "$_windir"
+        # Verify the directory was created successfully
+        if [ ! -d "$_windir" ]; then
+            fatal "Failed to create directory: $_windir"
+            exit 2
+        fi
     fi
     _csize=$(zenity --entry --title="LSW" --text="Enter Windows disk (C:) size in GB. Leave empty to use 50GB." --entry-text "50" --height=300 --width=360)
     local available_gb=$(df -BG "$_windir" | awk 'NR==2 { gsub("G","",$4); print $4 }')
