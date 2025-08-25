@@ -1047,7 +1047,8 @@ function waCheckRDPAccess() {
         /scale:"$RDP_SCALE" \
         +auto-reconnect \
         /app:program:"C:\Windows\System32\cmd.exe",cmd:"/C type NUL > $TEST_PATH_WIN && tsdiscon" \
-        /v:"$RDP_IP:$RDP_PORT" &>"$FREERDP_LOG" &
+        /v:"$RDP_IP:$RDP_PORT" &>"$FREERDP_LOG" \
+        /drive:home,/home/tony &
 
     # Store the FreeRDP process ID.
     FREERDP_PROC=$!
